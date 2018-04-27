@@ -174,3 +174,86 @@ function f() {
 const MY_OBJECT = {"key": "value"};
 MY_OBJECT.key = "otherValue";
 ```
+#### 数据结构和类型
+
+JavaScript可以识别7种类型的值：
+
+* 六种原型数据类型
+  * Boolean.布尔值，true和false.
+  * null.一个表明null值得特殊关键字。JavaScript是大小写敏感的，因此null和Null、NULL或其他变量完全不同。
+  * undefined.变量未定义时的属性。
+  * Number.表示数字。
+  * String.表示字符串。
+  * Symbol(在ECMAScript中新添加的类型)。一种数据类型，它的实例是唯一不可改变的。
+* 以及Object对象。
+
+[Objects](https://developer.mozilla.org/zh-CN/docs/JavaScript/Reference/Global_Objects/Object) 和 [functions](https://developer.mozilla.org/zh-CN/docs/JavaScript/Reference/Global_Objects/Function) 是本语言的其他两个基本要素。你可以将对象视为存放值的命名容器，而将函数视为你的应用程序能够执行的过程(procedures)。
+
+##### 数据类型的转换（Data type conversion）
+
+JavaScript是一种动态类型语言(dynamically typed language)。这意味着你声明变量时可以不必指定数据类型，而数据类型会在脚本执行时根据需要自动转换。
+
+在涉及加法运算符(+)的数字和字符串表达式中，JavaScript 会把**数字值转换为字符串**。例如，假设有如下的语句：
+
+```javascript
+x = "The answer is " + 42 // "The answer is 42"
+y = 42 + " is the answer" // "42 is the answer"
+```
+
+在涉及其它运算符（译注：如下面的减号'-'）时，JavaScript语言不会把数字变为字符串。例如（译注：第一例是数学运算，第二例是字符串运算）：
+
+```javascript
+"37" - 7 // 30
+"37" + 7 // "377"
+```
+
+##### 字符串转换为数字（converting strings to numbers）
+
+有一些方法可以将内存中表示一个数字的字符串转换为对应的数字
+
+`parseInt()`和`parseFloat()`
+
+`parseInt `仅能够返回整数，所以使用它会丢失小数部分。另外，调用 parseInt 时最好总是带上进制(radix) 参数，这个参数用于指定使用哪一种进制。
+
+**单目加法运算符**
+
+将字符串转换为数字的另一种方法是使用**单目加法运算符**。
+
+```javascript
+"1.1" + "1.1" = "1.11.1"
+(+"1.1") + (+"1.1") = 2.2   // 注：加入括号为清楚起见，不是必需的。
+```
+
+#### 字面量（Literals）
+
+（译注：字面量是由语法表达式定义的**常量**；或，通过由一定字词组成的语词表达式定义的常量）
+
+在JavaScript中，你可以使用各种字面量。这些字面量是脚本中按字面意思给出的固定的值，而不是变量。（译注：字面量是常量，其值是固定的，而且在程序脚本运行中不可更改，比如*false*，3.1415，thisIsStringOfHelloworld ，invokedFunction: myFunction("myArgument")。本节将介绍以下类型的字面量：
+
+- [数组字面量(Array literals)](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_Types#%E6%95%B0%E7%BB%84%E5%AD%97%E9%9D%A2%E9%87%8F(Array_literals))
+- [布尔字面量(Boolean literals)](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_Types#%E5%B8%83%E5%B0%94%E5%AD%97%E9%9D%A2%E9%87%8F(Boolean_literals))
+- [浮点数字面量(Floating-point literals)](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_Types#%E6%B5%AE%E7%82%B9%E6%95%B0%E5%AD%97%E9%9D%A2%E9%87%8F(Floating-point_literals))
+- [整数(Intergers)](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_Types#%E6%95%B4%E6%95%B0(Intergers))
+- [对象字面量(Object literals)](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_Types#%E5%AF%B9%E8%B1%A1%E5%AD%97%E9%9D%A2%E9%87%8F(Object_literals))
+- [RegExp literals](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_Types#RegExp_literals)
+- [字符串字面量(String literals)](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_Types#%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%AD%97%E9%9D%A2%E9%87%8F(String_literals))
+
+##### 数组字面量（Array literals）
+
+数组字面值是一个封闭在方括号对([])中的包含有零个或多个表达式的列表，其中每个表达式代表数组的一个元素。当你使用数组字面值创建一个数组时，该数组将会以指定的值作为其元素进行初始化，而其长度被设定为元素的个数。
+
+下面的示例用3个元素生成数组`coffees`，它的长度是3。
+
+```javascript
+var coffees = ["French Roast", "Colombian", "Kona"];
+
+var a=[3];
+
+console.log(a.length); // 1
+
+console.log(a[0]); // 3
+```
+
+若在顶层（全局）脚本里用字面值创建数组，JavaScript语言将会在每次对包含该数组字面值的表达式求值时解释该数组。另一方面，在函数中使用的数组，将在每次调用函数时都会被创建一次。
+
+数组字面值同时也是数组对象。有关数组对象的详情请参见[数组对象](https://developer.mozilla.org/zh-CN/docs/JavaScript/Guide/Predefined_Core_Objects#Array_Object)一文。
