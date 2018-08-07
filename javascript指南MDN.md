@@ -1139,3 +1139,133 @@ function imgLoad(url) {
   });
 }
 ```
+## 循环和迭代
+
+循环有很多种类，但本质上它们都做的是同一件事：它们把一个动作重复了很多次（实际上重复的次数有可能为0）。各种循环机制提供了不同的方法去确定循环的开始和结束。不同情况下，某一种类型循环会比其它的循环用起来更简单。 
+
+#### `for` 语句
+
+一个[`for循环`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for)会一直重复执行，直到指定的循环条件为fasle。 JavaScript的for循环和Java与C的for循环是很相似的。一个for语句是这个样子的：
+
+```
+for ([initialExpression]; [condition]; [incrementExpression])
+  statement
+```
+
+当一个for循环执行的时候，会发生以下事件：
+
+1. 如果有初始化表达式`initialExpression`，它将被执行。这个表达式通常会初始化一个或多个循环计数器，但语法上是允许一个任意复杂度的表达式的。这个表达式也可以声明变量。
+2. 计算`condition`表达式的值。如果`condition的值是`true，循环中的statement会被执行。如果`condition`的值是false，for循环终止。如果`condition表达式整个都被省略掉了，`condition的值会被认为是true。
+3. `循环中的statement被执行。如果需要执行多条语句，可以使用块` (`{ ... }`)`来包裹这些语句。`
+4. 如果有更新表达式`incrementExpression`，执行它.
+5. 然后流程回到步骤2。
+
+#### `do...while` 语句
+
+`do...while` 语句一直重复直到指定的条件求值得到假（false）。 一个 do...while 语句看起来像这样：
+
+```
+do
+  statement
+while (condition);
+```
+
+`statement` 在检查条件之间会执行一次。要执行多条语句（语句块），要使用块语句 ({ ... }) 包括起来。 如果 `condition` 为真（true），`statement` 将再次执行。 在每个执行的结尾会进行条件的检查。当 `condition` 为假（false），执行会停止并且把控制权交回给 do...while 后面的语句。
+
+#### `while` 语句
+
+一个 `while` 语句只要指定的条件求值为真（true）就会一直执行它的语句块。一个 while 语句看起来像这样：
+
+```
+while (condition)
+  statement
+```
+
+如果这个条件变为假，循环里的 `statement` 将会停止执行并把控制权交回给 while 语句后面的代码。
+
+条件检测会在每次 `statement` 执行之前发生。如果条件返回为真， `statement` 会被执行并紧接着再次测试条件。如果条件返回为假，执行将停止并把控制权交回给 while 后面的语句。
+
+要执行多条语句（语句块），要使用块语句 ({ ... }) 包括起来。
+
+#### `labeled` 语句
+
+一个 [label](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/label) 提供了一个可以让你引用到您程序别的位置的标识符。例如，你可以用 label 标识一个循环， 然后使用 break 或者 continue 来指出程序是否该停止循环还是继续循环。
+
+label 语句的语法看起来像这样：
+
+```javascript
+label :
+   statement
+```
+
+`label` 的值可以是任何的非保留字的 JavaScript 标识符， `statement 可以是任意你想要标识的语句（块）。`
+
+在这个例子里，标记 `markLoop` 标识了一个 while 循环。
+
+```javascript
+markLoop:
+while (theMark == true) {
+   doSomething();
+}
+```
+
+#### `break` 语句
+
+使用 `break` 语句来终止循环，`switch`， 或者是链接到 label 语句。
+
+- 当你使用不带 label 的 `break` 时， 它会立即终止当前所在的 `while`，`do-while`，`for`，或者 `switch` 并把控制权交回这些结构后面的语句。
+- 当你使用带 label 的 `break` 时，它会终止指定的标记（label）了的语句。
+
+break 语句的语法看起来像这样：
+
+1. `break;`
+2. `break *label*;`
+
+第一种形式的语法终止当前所在的循环或 switch； 第二种形式的语法终止指定的 label 语句。
+
+#### `continue` 语句
+
+这个 `continue` 语句可以用来继续执行（跳过代码块的剩余部分并进入下一循环）一个 while， do-while， for， 或者 label 语句。
+
+- 当你使用不带 label 的 `continue` 时， 它终止当前 while，do-while，或者 for 语句到结尾的这次的循环并且继续执行下一次循环。
+- 当你使用带 label 的 `continue` 时， 它会应用被 label 标识的循环语句。
+
+`continue` 的语法看起来像这样：
+
+1. `continue;`
+2. `continue `*label;*
+
+#### `for...in` 语句
+
+这个 [`for...in`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/for...in) 语句循环一个指定的变量来循环一个对象所有可枚举的属性。JavaScript 会为每一个不同的属性执行指定的语句。
+
+```javascript
+for (variable in object) {
+  statements
+}
+```
+
+#### `for...of` 语句
+
+`for...of语句在可迭代的对象上创建了一个循环`(包括[`Array`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Array), [`Map`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Map), [`Set`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Set), 参数对象（ [arguments](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/arguments)） 等等)，对值的每一个独特的属性调用一个将被执行的自定义的和语句挂钩的迭代。
+
+```
+for (variable of object) {
+  statement
+}
+```
+
+下面的这个例子展示了 `for...of 和` `for...in 两种循环语句之间的区别。与` `for...in` 循环遍历的结果是数组元素的下标不同的是， `for...of 遍历的结果是元素的值：`
+
+```javascript
+let arr = [3, 5, 7];
+arr.foo = "hello";
+
+for (let i in arr) {
+   console.log(i); // logs "0", "1", "2", "foo"
+}
+
+for (let i of arr) {
+   console.log(i); // logs "3", "5", "7" // 注意这里没有 hello
+}
+```
