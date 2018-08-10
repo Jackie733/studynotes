@@ -1269,3 +1269,348 @@ for (let i of arr) {
    console.log(i); // logs "3", "5", "7" // 注意这里没有 hello
 }
 ```
+## 函数
+
+函数是 JavaScript 中的基本组件之一。 一个函数是 JavaScript 过程 — 一组执行任务或计算值的语句。要使用一个函数，你必须将其定义在你希望调用它的作用域内。 
+
+#### 定义函数
+
+##### 函数声明
+
+一个**函数定义**（也称为**函数声明**，或**函数语句**）由一系列的[`function`](https://developer.mozilla.org/zh-CN/docs/JavaScript/Reference/Statements/function)关键字组成，依次为：
+
+- 函数的名称。
+- 函数参数列表，包围在括号中并由逗号分隔。
+- 定义函数的 JavaScript 语句，用大括号`{}`括起来。
+
+例如，以下的代码定义了一个简单的`square`函数：
+
+```javascript
+function square(number) {
+  return number * number;
+}
+```
+
+函数`square`使用了一个参数，叫作`number`。这个函数只有一个语句，它说明该函数将函数的参数（即`number`）自乘后返回。函数的[`return`](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Statements/return)语句确定了函数的返回值。
+
+原始参数（比如一个具体的数字）被作为**值**传递给函数；<u>值被传递给函数，如果被调用函数改变了这个参数的值，这样的改变不会影响到全局或调用函数。</u>
+
+如果你传递一个对象（即一个非原始值，例如[`Array`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Array)或用户自定义的对象）作为参数，而函数改变了这个对象的属性，这样的改变对函数外部是可见的，如下面的例子所示：
+
+```javascript
+function myFunc(theObject) {
+  theObject.make = "Toyota";
+}
+
+var mycar = {make: "Honda", model: "Accord", year: 1998};
+var x, y;
+
+x = mycar.make;     // x获取的值为 "Honda"
+
+myFunc(mycar);
+y = mycar.make;     // y获取的值为 "Toyota"
+                    // (make属性被函数改变了)
+```
+
+##### 函数表达式
+
+虽然上面的函数声明在语法上是一个语句，但函数也可以由函数表达式创建。这样的函数可以是**匿名**的；它不必有一个名称。例如，函数`square`也可这样来定义：
+
+```javascript
+var square = function(number) { return number * number; };
+var x = square(4); // x gets the value 16
+```
+
+然而，函数表达式也可以提供函数名，并且可以用于在函数内部代指其本身，或者在调试器堆栈跟踪中识别该函数：
+
+```javascript
+var factorial = function fac(n) {return n<2 ? 1 : n*fac(n-1)};
+
+console.log(factorial(3));
+```
+
+当将函数作为参数传递给另一个函数时，函数表达式很方便。下面的例子演示了一个叫`map`的函数如何被定义，而后使用一个表达式函数作为其第一个参数进行调用：
+
+```javascript
+function map(f,a) {
+  var result = [], // 创建一个新的数组
+      i;
+
+  for (i = 0; i != a.length; i++)
+    result[i] = f(a[i]);
+  return result;
+}
+```
+
+下面的代码：
+
+```javascript
+function map(f, a) {
+  var result = []; // 创建一个数组
+  var i; // 声明一个值，用来循环
+  for (i = 0; i != a.length; i++)
+    result[i] = f(a[i]);
+      return result;
+}
+var f = function(x) {
+   return x * x * x; 
+}
+var numbers = [0,1, 2, 5,10];
+var cube = map(f,numbers);
+console.log(cube);
+```
+
+返回 [0, 1, 8, 125, 1000]。
+
+在 JavaScript 中，可以根据条件来定义一个函数。比如下面的代码，当`num` 等于 0 的时候才会定义 `myFunc` ：
+
+```javascript
+var myFunc;
+if (num == 0){
+  myFunc = function(theObject) {
+    theObject.make = "Toyota"
+  }
+}
+```
+
+除了上述的定义函数方法外，你也可以在运行时用 [`Function`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Function) 构造器由一个字符串来创建一个函数 ，很像 [`eval()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/eval()) 函数。
+
+当一个函数是一个对象的属性时，称之为**方法**。
+
+#### 调用函数
+
+定义一个函数并不会自动的执行它。定义了函数仅仅是赋予函数以名称并明确函数被调用时该做些什么。**调用**函数才会以给定的参数真正执行这些动作。 
+
+函数一定要处于调用它们的域中，但是函数的声明可以被提升(出现在调用语句之后)（函数提升仅适用于函数声明，而不适用于函数表达式），如下例：
+
+```javascript
+console.log(square(5));
+/* ... */
+function square(n) { return n*n }
+```
+
+函数域是指函数声明时的所在的地方，或者函数在顶层被声明时指整个程序。
+
+函数的参数并不局限于字符串或数字。你也可以将整个对象传递给函数。 
+
+函数可以被递归，就是说函数可以调用其本身。例如，下面这个函数就是用递归计算阶乘：
+
+```javascript
+function factorial(n){
+  if ((n == 0) || (n == 1))
+    return 1;
+  else
+    return (n * factorial(n - 1));
+}
+```
+#### 函数作用域
+
+在函数内定义的变量不能在函数之外的任何地方访问，因为变量仅仅在该函数的域的内部有定义。相对应的，一个函数可以访问定义在其范围内的任何变量和函数。换言之，定义在全局域中的函数可以访问所有定义在全局域中的变量。在另一个函数中定义的函数也可以访问在其父函数中定义的所有变量和父函数有权访问的任何其他变量。
+
+```javascript
+// 下面的变量定义在全局作用域(global scope)中
+var num1 = 20,
+    num2 = 3,
+    name = "Chamahk";
+
+// 本函数定义在全局作用域
+function multiply() {
+  return num1 * num2;
+}
+
+multiply(); // 返回 60
+
+// 嵌套函数的例子
+function getScore() {
+  var num1 = 2,
+      num2 = 3;
+  
+  function add() {
+    return name + " scored " + (num1 + num2);
+  }
+  
+  return add();
+}
+
+getScore(); // 返回 "Chamahk scored 5"
+```
+
+#### 作用域和函数堆栈
+
+##### 递归
+
+一个函数可以指向并调用自身。有三种方法可以达到这个目的：
+
+1. 函数名
+2. `arguments.callee`
+3. 作用域下的一个指向该函数的变量名
+
+例如，思考一下如下的函数定义：
+
+```javascript
+var foo = function bar() {
+   // statements go here
+};
+```
+
+在这个函数体内，以下的语句是等价的：
+
+1. `bar()`
+2. `arguments.callee()`
+3. `foo()`
+
+调用自身的函数我们称之为*递归函数*。在某种意义上说，递归近似于循环。两者都重复执行相同的代码，并且两者都需要一个终止条件（避免无限循环或者无限递归）。例如以下的循环：
+
+```javascript
+var x = 0;
+while (x < 10) { // "x < 10" 是循环条件
+   // do stuff
+   x++;
+}
+```
+
+可以被转化成一个递归函数和对其的调用：
+
+```javascript
+function loop(x) {
+  if (x >= 10) // "x >= 10" 是退出条件（等同于 "!(x < 10)"）
+    return;
+  // 做些什么
+  loop(x + 1); // 递归调用
+}
+loop(0);
+```
+
+不过，有些算法并不能简单的用迭代来实现。例如，获取树结构中所有的节点时，使用递归实现要容易得多：
+
+```javascript
+function walkTree(node) {
+  if (node == null) // 
+    return;
+  // do something with node
+  for (var i = 0; i < node.childNodes.length; i++) {
+    walkTree(node.childNodes[i]);
+  }
+}
+```
+
+跟`loop`函数相比，这里每个递归调用都产生了更多的递归。
+
+将递归算法转换为非递归算法是可能的，不过逻辑上通常会更加复杂，而且需要使用堆栈。事实上，递归函数就使用了堆栈：函数堆栈。
+
+这种类似堆栈的行为可以在下例中看到：
+
+```javascript
+function foo(i) {
+  if (i < 0)
+    return;
+  console.log('begin:' + i);
+  foo(i - 1);
+  console.log('end:' + i);
+}
+foo(3);
+
+// 输出:
+
+// begin:3
+// begin:2
+// begin:1
+// begin:0
+// end:0
+// end:1
+// end:2
+// end:3
+```
+
+##### 嵌套函数和闭包
+
+你可以在一个函数里面嵌套另外一个函数。嵌套（内部）函数对其容器（外部）函数是私有的。它自身也形成了一个闭包。一个闭包是一个可以自己拥有独立的环境与变量的的表达式（通常是函数）。
+
+既然嵌套函数是一个闭包，就意味着一个嵌套函数可以”继承“容器函数的参数和变量。换句话说，内部函数包含外部函数的作用域。
+
+可以总结如下：
+
+- 内部函数只可以在外部函数中访问。
+- 内部函数形成了一个闭包：它可以访问外部函数的参数和变量，但是外部函数却不能使用它的参数和变量。
+
+下面的例子展示了嵌套函数：
+
+```javascript
+function addSquares(a, b) {
+  function square(x) {
+    return x * x;
+  }
+  return square(a) + square(b);
+}
+a = addSquares(2, 3); // returns 13
+b = addSquares(3, 4); // returns 25
+c = addSquares(4, 5); // returns 41
+```
+
+由于内部函数形成了闭包，因此你可以调用外部函数并为外部函数和内部函数指定参数：
+
+```javascript
+function outside(x) {
+  function inside(y) {
+    return x + y;
+  }
+  return inside;
+}
+fn_inside = outside(3); // Think of it like: give me a function that adds 3 to whatever you give it
+result = fn_inside(5); // returns 8
+
+result1 = outside(3)(5); // returns 8
+```
+
+##### 保存变量
+
+注意到上例中 `inside` 被返回时 `x` 是怎么被保留下来的。一个闭包必须保存它可见作用域中所有参数和变量。因为每一次调用传入的参数都可能不同，每一次对外部函数的调用实际上重新创建了一遍这个闭包。只有当返回的 `inside` 没有再被引用时，内存才会被释放。
+
+这与在其他对象中存储引用没什么不同，但是通常不太明显，因为并不能直接设置引用，也不能检查它们。
+
+##### 多层嵌套函数
+
+函数可以被多层嵌套。例如，函数A可以包含函数B，函数B可以再包含函数C。B和C都形成了闭包，所以B可以访问A，C可以访问B和A。因此，闭包可以包含多个作用域；他们递归式的包含了所有包含它的函数作用域。这个称之为作用*域链*。（稍后会详细解释）
+
+思考一下下面的例子：
+
+```javascript
+function A(x) {
+  function B(y) {
+    function C(z) {
+      console.log(x + y + z);
+    }
+    C(3);
+  }
+  B(2);
+}
+A(1); // logs 6 (1 + 2 + 3)
+```
+
+在这个例子里面，C可以访问B的y和A的x。这是因为：
+
+1. B形成了一个包含A的闭包，B可以访问A的参数和变量
+2. C形成了一个包含B的闭包
+3. B包含A，所以C也包含A，C可以访问B和A的参数和变量。换言之，C用这个顺序链接了B和A的作用域
+
+反过来却不是这样。A不能访问C，因为A看不到B中的参数和变量，C是B中的一个变量，所以C是B私有的。
+
+##### 命名冲突
+
+当同一个闭包作用域下两个参数或者变量同名时，就会产生命名冲突。更近的作用域有更高的优先权，所以最近的优先级最高，最远的优先级最低。这就是作用域链。链的第一个元素就是最里面的作用域，最后一个元素便是最外层的作用域。
+
+看以下的例子：
+
+```javascript
+function outside() {
+  var x = 5;
+  function inside(x) {
+    return x * 2;
+  }
+  return inside;
+}
+
+outside()(10); // returns 20 instead of 10
+```
+
+命名冲突发生在`return x`上，`inside`的参数`x`和`outside`变量`x`发生了冲突。这里的作用链域是{`inside`, `outside`, 全局对象}。因此`inside`的`x`具有最高优先权，返回了20（`inside`的`x`）而不是10（`outside`的`x`）。
