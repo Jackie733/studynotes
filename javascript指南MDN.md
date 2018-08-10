@@ -1614,3 +1614,293 @@ outside()(10); // returns 20 instead of 10
 ```
 
 命名冲突发生在`return x`上，`inside`的参数`x`和`outside`变量`x`发生了冲突。这里的作用链域是{`inside`, `outside`, 全局对象}。因此`inside`的`x`具有最高优先权，返回了20（`inside`的`x`）而不是10（`outside`的`x`）。
+
+#### 闭包
+
+闭包是 JavaScript 中最强大的特性之一。JavaScript 允许函数嵌套，并且内部函数可以访问定义在外部函数中的所有变量和函数，以及外部函数能访问的所有变量和函数。但是，外部函数却不能够访问定义在内部函数中的变量和函数。这给内部函数的变量提供了一定的安全性。此外，由于内部函数可以访问外部函数的作用域，因此当内部函数生存周期大于外部函数时，外部函数中定义的变量和函数将的生存周期比内部函数执行时间长。当内部函数以某一种方式被任何一个外部函数作用域访问时，一个闭包就产生了。
+
+```javascript
+var pet = function(name) {          //外部函数定义了一个变量"name"
+  var getName = function() {            
+    //内部函数可以访问 外部函数定义的"name"
+    return name; 
+  }
+  //返回这个内部函数，从而将其暴露在外部函数作用域
+  return getName;               
+};
+myPet = pet("Vivie");
+    
+myPet();                            // 返回结果 "Vivie"
+```
+
+实际上可能会比上面的代码复杂的多。在下面这种情形中，返回了一个包含可以操作外部函数的内部变量方法的对象。
+
+```javascript
+var createPet = function(name) {
+  var sex;
+  
+  return {
+    setName: function(newName) {
+      name = newName;
+    },
+    
+    getName: function() {
+      return name;
+    },
+    
+    getSex: function() {
+      return sex;
+    },
+    
+    setSex: function(newSex) {
+      if(typeof newSex == "string" 
+        && (newSex.toLowerCase() == "male" || newSex.toLowerCase() == "female")) {
+        sex = newSex;
+      }
+    }
+  }
+}
+
+var pet = createPet("Vivie");
+pet.getName();                  // Vivie
+
+pet.setName("Oliver");
+pet.setSex("male");
+pet.getSex();                   // male
+pet.getName();                  // Oliver
+```
+
+在上面的代码中，外部函数的`name`变量对内嵌函数来说是可取得的，而除了通过内嵌函数本身，没有其它任何方法可以取得内嵌的变量。内嵌函数的内嵌变量就像内嵌函数的保险柜。它们会为内嵌函数保留“稳定”——而又安全——的数据参与运行。而这些内嵌函数甚至不会被分配给一个变量，或者不必一定要有名字。
+
+```javascript
+var getCode = (function(){
+  var secureCode = "0]Eal(eh&2";    // A code we do not want outsiders to be able to modify...
+  
+  return function () {
+    return secureCode;
+  };
+})();
+
+getCode();    // Returns the secret code
+```
+
+尽管有上述优点，使用闭包时仍然要小心避免一些陷阱。如果一个闭包的函数用外部函数的变量名定义了同样的变量，那在外部函数域将再也无法指向该变量。
+
+```javascript
+var createPet = function(name) {  // Outer function defines a variable called "name"
+  return {
+    setName: function(name) {    // Enclosed function also defines a variable called "name"
+      name = name;               // ??? How do we access the "name" defined by the outer function ???
+    }
+  }
+}
+```
+
+#### 使用 arguments 对象
+
+函数的实际参数会被保存在一个类似数组的arguments对象中。在函数内，你可以按如下方式找出传入的参数：
+
+```javascript
+arguments[i]
+```
+
+其中`i`是参数的序数编号（译注：数组索引），以0开始。所以第一个传来的参数会是`arguments[0]`。参数的数量由`arguments.length`表示。
+
+使用arguments对象，你可以处理比声明的更多的参数来调用函数。这在你事先不知道会需要将多少参数传递给函数时十分有用。你可以用`arguments.length`来获得实际传递给函数的参数的数量，然后用`arguments`对象来取得每个参数。
+
+例如，设想有一个用来连接字符串的函数。唯一事先确定的参数是在连接后的字符串中用来分隔各个连接部分的字符（译注：比如例子里的分号“；”）。该函数定义如下：
+
+```javascript
+function myConcat(separator) {
+   var result = ''; // 把值初始化成一个字符串，这样就可以用来保存字符串了！！
+   var i;
+   // iterate through arguments
+   for (i = 1; i < arguments.length; i++) {
+      result += arguments[i] + separator;
+   }
+   return result;
+}
+```
+
+你可以给这个函数传递任意数量的参数，它会将各个参数连接成一个字符串“列表”：
+
+```javascript
+// returns "red, orange, blue, "
+myConcat(", ", "red", "orange", "blue");
+
+// returns "elephant; giraffe; lion; cheetah; "
+myConcat("; ", "elephant", "giraffe", "lion", "cheetah");
+
+// returns "sage. basil. oregano. pepper. parsley. "
+myConcat(". ", "sage", "basil", "oregano", "pepper", "parsley");
+```
+
+**提示：**`arguments`变量只是 *”***类数组对象**“，并不是一个数组。称其为类数组对象是说它有一个索引编号和`length`属性。尽管如此，它并不拥有全部的Array对象的操作方法。
+
+#### 函数参数
+
+从ECMAScript 6开始，有两个新的类型的参数：默认参数，剩余参数。 
+
+##### 默认参数
+
+在JavaScript中，函数参数的默认值是`undefined`。然而，在某些情况下设置不同的默认值是有用的。这时默认参数可以提供帮助。
+
+在过去，用于设定默认的一般策略是在函数的主体测试参数值是否为`undefined`，如果是则赋予一个值。如果在下面的例子中，调用函数时没有实参传递给`b`，那么它的值就是`undefined`，于是计算`a*b`得到、函数返回的是 `NaN`：
+
+```javascript
+function multiply(a, b) {
+  b = (typeof b !== 'undefined') ?  b : 1;
+
+  return a*b;
+}
+
+multiply(5); // 5
+```
+
+使用默认参数，在函数体的检查就不再需要了。现在，你可以在函数头简单地把1设定为`b`的默认值：
+
+```javascript
+function multiply(a, b = 1) {
+  return a*b;
+}
+
+multiply(5); // 5
+```
+
+##### 剩余参数
+
+[剩余参数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/rest_parameters)语法允许将不确定数量的参数表示为数组。在下面的例子中，使用剩余参数收集从第二个到最后参数。然后，我们将这个数组的每一个数与第一个参数相乘。这个例子是使用了一个箭头函数，这将在下一节介绍。
+
+```javascript
+function multiply(multiplier, ...theArgs) {
+  return theArgs.map(x => multiplier * x);
+}
+
+var arr = multiply(2, 1, 2, 3);
+console.log(arr); // [2, 4, 6]
+```
+
+#### 箭头函数
+
+[箭头函数表达式](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Arrow_functions)（也称胖箭头函数）相比函数表达式具有较短的语法并以词法的方式绑定 `this`。箭头函数总是匿名的。另见 hacks.mozilla.org 的博文：“[深度了解ES6：箭头函数](https://hacks.mozilla.org/2015/06/es6-in-depth-arrow-functions/)”。
+
+有两个因素会影响引入箭头函数：更简洁的函数和 `this`。
+
+##### 更简洁的函数
+
+有一些函数模式，更简洁的函数很受欢迎。对比一下：
+
+```javascript
+var a = [
+  "Hydrogen",
+  "Helium",
+  "Lithium",
+  "Beryllium"
+];
+
+var a2 = a.map(function(s){ return s.length });
+
+console.log(a2); // logs [ 8, 6, 7, 9 ]
+
+var a3 = a.map( s => s.length );
+
+console.log(a3); // logs [ 8, 6, 7, 9 ]
+```
+
+### `this` 的词法
+
+在箭头函数出现之前，每一个新函数都重新定义了自己的 [this](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/this) 值（在严格模式下，一个新的对象在构造函数里是未定义的，以“对象方法”的方式调用的函数是上下文对象等）。以面向对象的编程风格，这样着实有点恼人。
+
+```javascript
+function Person() {
+  // The Person() constructor defines `this` as itself.
+  this.age = 0;
+
+  setInterval(function growUp() {
+    // In nonstrict mode, the growUp() function defines `this` 
+    // as the global object, which is different from the `this`
+    // defined by the Person() constructor.
+    this.age++;
+  }, 1000);
+}
+
+var p = new Person();
+```
+
+在ECMAScript 3/5里，通过把`this`的值赋值给一个变量可以修复这个问题。
+
+```javascript
+function Person() {
+  var self = this; // Some choose `that` instead of `self`. 
+                   // Choose one and be consistent.
+  self.age = 0;
+
+  setInterval(function growUp() {
+    // The callback refers to the `self` variable of which
+    // the value is the expected object.
+    self.age++;
+  }, 1000);
+}
+```
+
+另外，创建一个[约束函数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind)可以使得 `this`值被正确传递给 `growUp()` 函数。
+
+箭头功能捕捉闭包上下文的`this`值，所以下面的代码工作正常。
+
+```javascript
+function Person(){
+  this.age = 0;
+
+  setInterval(() => {
+    this.age++; // |this| properly refers to the person object
+  }, 1000);
+}
+
+var p = new Person();
+```
+
+#### 预定义函数
+
+JavaScript语言有好些个顶级的内建函数：
+
+- [`eval()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/eval)
+
+  `**eval()**`方法会对一串字符串形式的JavaScript代码字符求值。
+
+- [`uneval()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/uneval) 
+
+  `**uneval()**`方法创建的一个[`Object`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object)的源代码的字符串表示。
+
+- [`isFinite()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/isFinite)
+
+  `**isFinite()**`函数判断传入的值是否是有限的数值。 如果需要的话，其参数首先被转换为一个数值。
+
+- [`isNaN()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/isNaN)
+
+  `**isNaN()**`函数判断一个值是否是[`NaN`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/NaN)。注意：`isNaN`函数内部的`强制转换规则`十分有趣； 另一个可供选择的是ECMAScript 6 中定义[`Number.isNaN()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN) , 或者使用 `typeof`来判断数值类型。
+
+- [`parseFloat()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseFloat)
+
+  `**parseFloat()**` 函数解析字符串参数，并返回一个浮点数。
+
+- [`parseInt()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseInt)
+
+  `**parseInt()**` 函数解析字符串参数，并返回指定的基数（基础数学中的数制）的整数。
+
+- [`decodeURI()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/decodeURI)
+
+  `**decodeURI()**` 函数对先前经过[`encodeURI`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/encodeURI)函数或者其他类似方法编码过的字符串进行解码。
+
+- [`decodeURIComponent()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent)
+
+  `**decodeURIComponent()**`方法对先前经过[`encodeURIComponent`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent)函数或者其他类似方法编码过的字符串进行解码。
+
+- [`encodeURI()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/encodeURI)
+
+  `**encodeURI()**`方法通过用以一个，两个，三个或四个转义序列表示字符的UTF-8编码替换统一资源标识符（URI）的某些字符来进行编码（每个字符对应四个转义序列，这四个序列组了两个”替代“字符）。
+
+- [`encodeURIComponent()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent)
+
+  `**encodeURIComponent()**` 方法通过用以一个，两个，三个或四个转义序列表示字符的UTF-8编码替换统一资源标识符（URI）的每个字符来进行编码（每个字符对应四个转义序列，这四个序列组了两个”替代“字符）。
+
+- [`escape()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/escape) 已废弃的 `**unescape()**` 方法计算生成一个新的字符串，其中的十六进制转义序列将被其表示的字符替换。上述的转义序列就像[`escape`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/escape)里介绍的一样。因为 `unescape` 已经废弃，建议使用[`decodeURI()`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/decodeURI)或者[`decodeURIComponent`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent) 替代本方法。
